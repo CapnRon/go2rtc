@@ -46,10 +46,28 @@ Ultimate camera streaming application with support for dozens formats and protoc
 - HomeKit Accessory Protocol from [@brutella](https://github.com/brutella/hap)
 - creator of the project's logo [@v_novoseltsev](https://www.instagram.com/v_novoseltsev)
 
+> [!NOTE]
+> **This is a fork** of [AlexxIT/go2rtc](https://github.com/AlexxIT/go2rtc), on the `thingino-sei` branch, adding native support for [Thingino](https://github.com/themactep/thingino-firmware) camera SEI on-screen-display metadata - see [Thingino SEI OSD overlay](#thingino-sei-osd-overlay) below. This feature is not part of upstream go2rtc.
+
+## Thingino SEI OSD overlay
+
+[Thingino](https://github.com/themactep/thingino-firmware) camera firmware's RTSP server (`prudynt-t`) can embed on-screen-display text (timestamp, labels, etc.) directly in the H.264 bitstream as a custom SEI NAL, rather than burning it into the video pixels. This fork parses that metadata and streams it to the browser player live, overlaid on top of the video with **no transcoding** - go2rtc still just passes the H.264 through unchanged, the same as always.
+
+How it works:
+
+- `pkg/thingino` scans each access unit go2rtc already has in hand (no extra decode step) for a `user_data_unregistered` SEI NAL tagged with Thingino's fixed UUID, and extracts its JSON payload.
+- `internal/sei` adds a `"sei"` message type to the existing WebSocket API (`api/ws`), pushing the decoded JSON to subscribed clients whenever it changes - the same mechanism the built-in MSE player already uses for its own signaling.
+- `www/video-rtc.js` / `www/video-stream.js` subscribe automatically whenever MSE or WebRTC playback is active, and render the OSD as a positioned overlay on `stream.html`, with the timestamp interpolated live against `video.currentTime` between updates.
+
+No configuration needed - just open `stream.html?src=<name>` for a stream from a camera that embeds this metadata, and the overlay appears automatically. Cameras that don't embed it are unaffected.
+
+<p align="center"><img src="docs/thingino-sei-example.png" width="480" alt="Thingino SEI OSD overlay example"></p>
+
 <br>
 <details>
 <summary><b>Table of Contents</b></summary>
 
+- [Thingino SEI OSD overlay](#thingino-sei-osd-overlay)
 - [Installation](#installation)
   - [go2rtc: Binary](#go2rtc-binary)
   - [go2rtc: Docker](#go2rtc-docker)

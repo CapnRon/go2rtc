@@ -182,6 +182,14 @@ export class VideoRTC extends HTMLElement {
         if (this.ws) this.ws.send(JSON.stringify(value));
     }
 
+    /**
+     * Called whenever a new (changed) Thingino SEI OSD payload is received.
+     * Override in a subclass to render it - the base player has no UI for it.
+     * @param {Object} value - `{rotation, elements: [{t, text, x, y}, ...]}`
+     */
+    onsei(value) {
+    }
+
     /** @param {Function} isSupported */
     codecs(isSupported) {
         return this.CODECS
@@ -379,6 +387,14 @@ export class VideoRTC extends HTMLElement {
         if (this.mode.includes('webrtc') && 'RTCPeerConnection' in window) {
             modes.push('webrtc');
             this.onwebrtc();
+        }
+
+        if (modes.includes('mse') || modes.includes('webrtc')) {
+            this.send({type: 'sei'});
+            this.onmessage['sei'] = msg => {
+                if (msg.type !== 'sei') return;
+                this.onsei(msg.value);
+            };
         }
 
         if (this.mode.includes('mjpeg')) {
