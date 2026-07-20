@@ -1,0 +1,43 @@
+name: Sync with upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: thingino-sei
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fast-forward master to upstream/master
+        run: |
+          git remote add upstream https://github.com/AlexxIT/go2rtc.git
+          git fetch upstream master
+          git fetch origin master
+          git checkout -B master origin/master
+          git merge --ff-only upstream/master
+          git push origin master
+
+      - name: Merge master into thingino-sei
+        run: |
+          git checkout thingino-sei
+          if git merge origin/master --no-edit; then
+            git push origin thingino-sei
+          else
+            echo "::error::Merge conflict pulling upstream into thingino-sei - resolve manually (git checkout thingino-sei && git merge master)."
+            git merge --abort
+            exit 1
+          fi

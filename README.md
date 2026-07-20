@@ -47,7 +47,9 @@ Ultimate camera streaming application with support for dozens formats and protoc
 - creator of the project's logo [@v_novoseltsev](https://www.instagram.com/v_novoseltsev)
 
 > [!NOTE]
-> **This is a fork** of [AlexxIT/go2rtc](https://github.com/AlexxIT/go2rtc), on the `thingino-sei` branch, adding native support for [Thingino](https://github.com/themactep/thingino-firmware) camera SEI on-screen-display metadata - see [Thingino SEI OSD overlay](#thingino-sei-osd-overlay) below. This feature is not part of upstream go2rtc.
+> **This is a fork** of [AlexxIT/go2rtc](https://github.com/AlexxIT/go2rtc), on the `thingino-sei` branch (this repo's default branch), adding native support for [Thingino](https://github.com/themactep/thingino-firmware) camera SEI on-screen-display metadata - see [Thingino SEI OSD overlay](#thingino-sei-osd-overlay) below. This feature is not part of upstream go2rtc.
+>
+> `master` is kept as an untouched mirror of upstream `AlexxIT/go2rtc:master` - a [scheduled workflow](.github/workflows/sync-upstream.yml) fast-forwards it daily and merges it into `thingino-sei` automatically. If that merge ever hits a real conflict, the workflow fails (visible on the [Actions tab](../../actions/workflows/sync-upstream.yml)) instead of silently doing the wrong thing, and it needs a manual `git merge master` on this branch to resolve.
 
 ## Thingino SEI OSD overlay
 
